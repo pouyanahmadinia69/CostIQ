@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CostIQ</title>
+<meta name="theme-color" content="#0b2540">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CostIQ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#f2f5f3;--card:#fff;--ink:#14302a;--mut:#5d7069;--line:#d6e0db;--acc:#0f6e56;--accbg:#e1f5ee;--bad:#a32d2d;--badbg:#fcebeb}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a17;--card:#17251f;--ink:#e6f0ec;--mut:#98ada5;--line:#2b3d36;--acc:#5dcaa5;--accbg:#0f2f27;--bad:#f09595;--badbg:#3a1a1a}}
+:root[data-theme="dark"]{--bg:#101a17;--card:#17251f;--ink:#e6f0ec;--mut:#98ada5;--line:#2b3d36;--acc:#5dcaa5;--accbg:#0f2f27;--bad:#f09595;--badbg:#3a1a1a}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.7;font-size:15px}
+main{max-width:760px;margin:0 auto;padding:14px 12px calc(90px + env(safe-area-inset-bottom,0px))}
+h1{font-size:20px;margin:6px 0 10px}h2{font-size:16px;margin:0 0 10px}
+section,.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.card{margin-bottom:10px;position:relative}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:8px;padding-inline-end:26px}
+.hd{color:var(--mut);font-size:12px}
+input,select,textarea{width:100%;min-width:0;font:inherit;font-size:14px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+input:focus,select:focus,button:focus-visible,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px}
+button.x{position:absolute;top:4px;inset-inline-end:4px;border:0;background:none;color:var(--bad);font-size:20px;padding:2px 8px}
+button.add,button.pri{color:var(--acc);border-color:var(--acc)}
+button.pri{background:var(--accbg);margin:0 0 8px}
+.rc,.li{display:grid;grid-template-columns:2fr 1fr 30px;gap:6px;margin-bottom:6px;align-items:end}
+.li{grid-template-columns:2fr 1fr 1.3fr 30px}
+.rc button,.li button{border:0;background:none;color:var(--bad);font-size:20px;padding:0 0 4px}
+.rc{align-items:center}.rc button{padding:0}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:start}th{color:var(--mut);font-weight:500}
+.res{display:grid;grid-template-columns:1fr auto;gap:2px 12px;background:var(--accbg);border-radius:8px;padding:10px;font-size:14px;margin-top:8px}
+.neg{color:var(--bad)}.tot{padding:12px;border-radius:10px;background:var(--accbg);margin-bottom:10px}.tot.l{background:var(--badbg)}
+nav{position:fixed;bottom:0;inset-inline:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px));z-index:5}
+nav button{flex:1;border:0;background:none;font-size:10px;padding:4px 0;color:var(--mut);line-height:1.3}
+nav button span{display:block;font-size:18px}nav button.on{color:var(--acc);font-weight:700}
+.note{color:var(--mut);font-size:12px;margin:4px 0 8px}.ft{font-weight:500;margin-top:6px;display:inline-block;margin-inline-start:8px}
+</style>
+</head>
+<body>
+<main id="m"></main>
+<nav id="nav"></nav>
+<script>
+var KEY='cc-v3';
+function sample(){return{
+ings:[{id:1,name:'برنج',price:120000,open:500,used:0},{id:2,name:'ران مرغ',price:180000,open:0,used:0},{id:3,name:'روغن',price:90000,open:50,used:0},{id:4,name:'ادویه',price:400000,open:10,used:0},{id:5,name:'پیاز',price:25000,open:100,used:0},{id:6,name:'رب',price:150000,open:20,used:0},{id:7,name:'زرشک',price:600000,open:10,used:0},{id:8,name:'زعفران',price:80000000,open:0.5,used:0}],
+inv:[{no:'1',date:'',sup:'آقای ایکس',items:[{ing:2,qty:1000,total:180000000}]},{no:'2',date:'',sup:'آقای سعید',items:[{ing:1,qty:1000,total:118000000}]}],
+sales:[],
+fixed:[{name:'اجاره',amt:30000000},{name:'حقوق',amt:60000000},{name:'آب، گاز و برق',amt:8000000},{name:'شارژ',amt:2000000}],
+dishes:[{id:1,name:'زرشک‌پلو با مرغ',type:'rest',sale:350000,pack:0,plan:100,recipe:[{ing:1,g:110},{ing:2,g:300},{ing:3,g:20},{ing:4,g:2},{ing:5,g:70},{ing:6,g:10},{ing:7,g:10},{ing:8,g:0.1}]}]};}
+function mig(o){if(!o||!o.ings||!o.dishes)return null;
+o.inv=(o.inv||[]).map((v,i)=>v.items?v:{no:String(i+1),date:v.date||'',sup:v.sup||'',items:[{ing:v.ing,qty:v.qty,total:v.total}]});
+o.dishes.forEach((d,i)=>{if(!d.id)d.id=i+1;delete d.count;});o.sales=o.sales||[];o.fixed=o.fixed||[];return o;}
+var S=null;try{S=mig(JSON.parse(localStorage.getItem(KEY)));}catch(e){}
+if(!S)try{S=mig(JSON.parse(localStorage.getItem('cc-v2')));}catch(e){}
+if(!S)S=sample();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function fa(n){return Math.round(n).toLocaleString('fa-IR');}
+function fa1(n){return n.toLocaleString('fa-IR',{maximumFractionDigits:1});}
+function $(id){return document.getElementById(id);}
+function nz(s){return String(s||'').replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776).replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632).replace(/ي/g,'ی').replace(/ك/g,'ک').toLowerCase();}
+function today(){return new Date().toLocaleDateString('fa-IR-u-nu-latn');}
+function mk(d){var a=nz(d).split(/[\/\-.]/);return a.length>1?a[0]+'/'+('0'+a[1]).slice(-2):'';}
+function nextNo(l){return String(l.reduce((m,x)=>Math.max(m,parseInt(nz(x.no))||0),0)+1);}
+function st(p,v,n){var a=p.split('.'),o=S;for(var i=0;i<a.length-1;i++)o=o[a[i]];var k=a[a.length-1];o[k]=n?(parseFloat(v)||0):v;save();out();}
+function I(p,v,n,ph){return '<input '+(n?'type="number" inputmode="decimal" step="any" ':'')+'value="'+esc(v)+'" placeholder="'+(ph||'')+'" oninput="st(\''+p+'\',this.value,'+(n?1:0)+')">';}
+function F(l,h){return '<div><div class="hd">'+l+'</div>'+h+'</div>';}
+function IS(p,val){return '<select onchange="st(\''+p+'\',this.value,1)">'+S.ings.map(g=>'<option value="'+g.id+'"'+(g.id==val?' selected':'')+'>'+esc(g.name||'بدون نام')+'</option>').join('')+'</select>';}
+function nid(a){return a.reduce((m,x)=>Math.max(m,x.id||0),0)+1;}
+function add(k,o){S[k].push(o);save();render();}
+function del(k,i){var r=S[k].splice(i,1)[0];
+if(k=='ings'){S.dishes.forEach(d=>d.recipe=d.recipe.filter(x=>x.ing!=r.id));S.inv.forEach(v=>v.items=v.items.filter(x=>x.ing!=r.id));}
+if(k=='dishes')S.sales.forEach(s=>s.items=s.items.filter(x=>x.dish!=r.id));
+save();render();}
+function G(id){return S.ings.find(g=>g.id==id);}
+function D(id){return S.dishes.find(d=>d.id==id);}
+function price(g){var p=g.price;S.inv.forEach(v=>v.items.forEach(x=>{if(x.ing==g.id&&x.qty>0)p=x.total/x.qty;}));return p;}
+function bought(g){var s=0;S.inv.forEach(v=>v.items.forEach(x=>{if(x.ing==g.id)s+=x.qty;}));return s;}
+function sold(g){var s=0;S.sales.forEach(v=>v.items.forEach(x=>{var d=D(x.dish);if(d)d.recipe.forEach(r=>{if(r.ing==g.id)s+=x.qty*r.g/1000;});}));return s;}
+function avail(g){return g.open+bought(g)-g.used-sold(g);}
+function mat(d){var m=0;d.recipe.forEach(r=>{var g=G(r.ing);if(g)m+=r.g/1000*price(g);});return m;}
+function pk(d){return d.type=='take'?d.pack:0;}
+function cost(d){return mat(d)+pk(d);}
+function fixedT(){return S.fixed.reduce((s,x)=>s+x.amt,0);}
+function pct(a,b){return b?fa1(a/b*100)+'٪':'-';}
+function lim(d,get){var c=Infinity,n='';d.recipe.forEach(r=>{var g=G(r.ing);if(g&&r.g>0){var x=Math.max(0,get(g))*1000/r.g;if(x<c){c=x;n=g.name;}}});return{c:c,n:n};}
+
+var tab='buy',qb='',qs='',pm='all';
+var TABS=[['buy','🧾','خرید'],['dish','🍛','غذاها'],['sale','💰','فروش'],['fix','💡','هزینه‌ها'],['plan','🔮','پیش‌بینی'],['pl','📊','سود و زیان'],['set','⚙️','تنظیمات']];
+var V={},O={};
+function render(){
+$('nav').innerHTML=TABS.map(t=>'<button class="'+(t[0]==tab?'on':'')+'" onclick="tab=\''+t[0]+'\';render();scrollTo(0,0)"><span>'+t[1]+'</span>'+t[2]+'</button>').join('');
+$('m').innerHTML=V[tab]();if(tab=='buy')drawInv();else if(tab=='sale')drawSales();else out();}
+function out(){if(O[tab])O[tab]();}
+function srch(id,v,fn){return '<input id="'+id+'" value="'+esc(v)+'" placeholder="جستجو: شماره، نام، تاریخ، ماده..." oninput="'+fn+'" style="margin-bottom:10px">';}
+
+V.buy=function(){
+var h='<h1>خرید و موجودی انبار</h1><section><h2>مواد اولیه</h2><div class="note">قیمت هر کیلو از آخرین فاکتور گرفته می‌شود. قیمت دستی فقط برای موادی است که فاکتور ندارند. موجودی = اولیه + خرید − مصرف دستی − فروش.</div>';
+S.ings.forEach((g,i)=>{h+='<div class="card"><button class="x" aria-label="حذف" onclick="del(\'ings\','+i+')">×</button><div class="g">'+F('نام',I('ings.'+i+'.name',g.name,0))+F('قیمت دستی (تومان/کیلو)',I('ings.'+i+'.price',g.price,1))+F('موجودی اولیه (کیلو)',I('ings.'+i+'.open',g.open,1))+F('ضایعات/مصرف دستی (کیلو)',I('ings.'+i+'.used',g.used,1))+'</div></div>';});
+h+='<button class="add" onclick="add(\'ings\',{id:nid(S.ings),name:\'\',price:0,open:0,used:0})">+ ماده جدید</button></section><section><h2>فاکتورهای خرید</h2>'+srch('qb',qb,'qb=this.value;drawInv()')+'<div id="invs"></div><button class="add" onclick="qb=\'\';add(\'inv\',{no:nextNo(S.inv),date:today(),sup:\'\',items:[{ing:S.ings[0]?S.ings[0].id:0,qty:0,total:0}]})">+ فاکتور جدید</button></section><section><h2>وضعیت انبار</h2><div class="sc" id="out"></div></section>';
+return h;};
+function drawInv(){var k=nz(qb),h='';
+S.inv.forEach((v,i)=>{var t=nz(v.no+' '+v.date+' '+v.sup+' '+v.items.map(x=>{var g=G(x.ing);return g?g.name:'';}).join(' '));if(k&&t.indexOf(k)<0)return;
+h+='<div class="card"><button class="x" aria-label="حذف فاکتور" onclick="if(confirm(\'این فاکتور حذف شود؟\'))del(\'inv\','+i+')">×</button><div class="g">'+F('شماره فاکتور',I('inv.'+i+'.no',v.no,0))+F('تاریخ',I('inv.'+i+'.date',v.date,0))+F('تأمین‌کننده',I('inv.'+i+'.sup',v.sup,0))+'</div>';
+v.items.forEach((x,j)=>{h+='<div class="li">'+F('ماده',IS('inv.'+i+'.items.'+j+'.ing',x.ing))+F('مقدار (کیلو)',I('inv.'+i+'.items.'+j+'.qty',x.qty,1))+F('مبلغ (تومان)',I('inv.'+i+'.items.'+j+'.total',x.total,1))+'<button aria-label="حذف آیتم" onclick="S.inv['+i+'].items.splice('+j+',1);save();render()">×</button></div>';});
+h+='<button class="add" onclick="S.inv['+i+'].items.push({ing:S.ings[0]?S.ings[0].id:0,qty:0,total:0});save();render()">+ آیتم</button><span class="ft" id="it'+i+'"></span></div>';});
+$('invs').innerHTML=h||'<div class="note">فاکتوری پیدا نشد.</div>';O.buy();}
+O.buy=function(){var e=$('out');if(!e)return;
+e.innerHTML='<table><tr><th>ماده</th><th>قیمت/کیلو</th><th>خرید کل</th><th>فروخته‌شده</th><th>موجودی</th></tr>'+S.ings.map(g=>'<tr><td>'+esc(g.name)+'</td><td>'+fa(price(g))+'</td><td>'+fa1(bought(g))+'</td><td>'+fa1(sold(g))+'</td><td class="'+(avail(g)<0?'neg':'')+'">'+fa1(avail(g))+'</td></tr>').join('')+'</table>';
+S.inv.forEach((v,i)=>{var el=$('it'+i);if(el)el.textContent='جمع فاکتور: '+fa(v.items.reduce((s,x)=>s+x.total,0))+' تومان';});};
+
+V.dish=function(){
+var h='<h1>غذاها و قیمت تمام‌شده</h1>';
+S.dishes.forEach((d,i)=>{
+h+='<div class="card"><button class="x" aria-label="حذف غذا" onclick="if(confirm(\'غذا حذف شود؟\'))del(\'dishes\','+i+')">×</button><div class="g">'+F('نام غذا',I('dishes.'+i+'.name',d.name,0))
++F('نوع','<select onchange="st(\'dishes.'+i+'.type\',this.value);render()"><option value="rest"'+(d.type=='rest'?' selected':'')+'>رستوران</option><option value="take"'+(d.type=='take'?' selected':'')+'>بیرون‌بر</option></select>')
++F('قیمت فروش یک پرس',I('dishes.'+i+'.sale',d.sale,1))+(d.type=='take'?F('هزینه ظرف و قاشق',I('dishes.'+i+'.pack',d.pack,1)):'')+'</div><div class="hd">رسپی یک پرس (گرم)</div>';
+d.recipe.forEach((r,j)=>{h+='<div class="rc">'+IS('dishes.'+i+'.recipe.'+j+'.ing',r.ing)+I('dishes.'+i+'.recipe.'+j+'.g',r.g,1)+'<button aria-label="حذف" onclick="S.dishes['+i+'].recipe.splice('+j+',1);save();render()">×</button></div>';});
+h+='<button class="add" onclick="S.dishes['+i+'].recipe.push({ing:S.ings[0]?S.ings[0].id:0,g:0});save();render()">+ ماده در رسپی</button><div class="res" id="res'+i+'"></div></div>';});
+return h+'<button class="add" onclick="add(\'dishes\',{id:nid(S.dishes),name:\'\',type:\'rest\',sale:0,pack:0,plan:0,recipe:[]})">+ غذای جدید</button>';};
+O.dish=function(){S.dishes.forEach((d,i)=>{var e=$('res'+i);if(!e)return;var m=mat(d),c=cost(d),p=d.sale-c;
+e.innerHTML='<span>هزینه مواد یک پرس</span><b>'+fa(m)+'</b>'+(d.type=='take'?'<span>ظرف و قاشق</span><b>'+fa(pk(d))+'</b>':'')+'<span>قیمت تمام‌شده یک پرس</span><b>'+fa(c)+'</b><span>قیمت فروش</span><b>'+fa(d.sale)+'</b><span>درصد هزینه</span><b>'+pct(c,d.sale)+'</b><span>'+(p<0?'زیان':'سود')+' هر پرس</span><b class="'+(p<0?'neg':'')+'">'+fa(Math.abs(p))+'</b>';});};
+
+V.sale=function(){return '<h1>فروش</h1><div class="note">هر فاکتور فروش می‌تواند چند غذا داشته باشد. با ثبت فروش، مواد رسپی از موجودی انبار کم می‌شود.</div><section>'+srch('qs',qs,'qs=this.value;drawSales()')+'<div id="sls"></div><button class="add" onclick="qs=\'\';add(\'sales\',{no:nextNo(S.sales),date:today(),cust:\'\',items:[{dish:S.dishes[0]?S.dishes[0].id:0,qty:1,price:S.dishes[0]?S.dishes[0].sale:0}]})">+ فاکتور فروش جدید</button></section><div class="tot" id="out"></div>';};
+function DS(p,val){return '<select onchange="pickD('+p+',this.value)">'+S.dishes.map(d=>'<option value="'+d.id+'"'+(d.id==val?' selected':'')+'>'+esc(d.name||'بدون نام')+'</option>').join('')+'</select>';}
+function pickD(i,j,v){var x=S.sales[i].items[j],d=D(+v);x.dish=+v;x.price=d?d.sale:0;save();render();}
+function drawSales(){var k=nz(qs),h='';
+S.sales.forEach((v,i)=>{var t=nz(v.no+' '+v.date+' '+v.cust+' '+v.items.map(x=>{var d=D(x.dish);return d?d.name:'';}).join(' '));if(k&&t.indexOf(k)<0)return;
+h+='<div class="card"><button class="x" aria-label="حذف فاکتور" onclick="if(confirm(\'این فاکتور حذف شود؟\'))del(\'sales\','+i+')">×</button><div class="g">'+F('شماره فاکتور',I('sales.'+i+'.no',v.no,0))+F('تاریخ',I('sales.'+i+'.date',v.date,0))+F('مشتری / توضیح',I('sales.'+i+'.cust',v.cust,0))+'</div>';
+v.items.forEach((x,j)=>{h+='<div class="li">'+F('غذا',DS(i+','+j,x.dish))+F('تعداد پرس',I('sales.'+i+'.items.'+j+'.qty',x.qty,1))+F('قیمت هر پرس',I('sales.'+i+'.items.'+j+'.price',x.price,1))+'<button aria-label="حذف آیتم" onclick="S.sales['+i+'].items.splice('+j+',1);save();render()">×</button></div>';});
+h+='<button class="add" onclick="S.sales['+i+'].items.push({dish:S.dishes[0]?S.dishes[0].id:0,qty:1,price:S.dishes[0]?S.dishes[0].sale:0});save();render()">+ آیتم</button><span class="ft" id="st'+i+'"></span></div>';});
+$('sls').innerHTML=h||'<div class="note">فاکتوری پیدا نشد.</div>';O.sale();}
+O.sale=function(){var q=0,r=0;S.sales.forEach((v,i)=>{var s=v.items.reduce((a,x)=>a+x.qty*x.price,0);r+=s;q+=v.items.reduce((a,x)=>a+x.qty,0);var el=$('st'+i);if(el)el.textContent='جمع فاکتور: '+fa(s)+' تومان';});
+var e=$('out');if(e)e.innerHTML='جمع همه فروش‌ها: <b>'+fa(r)+'</b> تومان ('+fa(q)+' پرس در '+fa(S.sales.length)+' فاکتور)';};
+
+V.fix=function(){
+var h='<h1>هزینه‌های ثابت ماهانه</h1><section>';
+S.fixed.forEach((x,i)=>{h+='<div class="card"><button class="x" aria-label="حذف" onclick="del(\'fixed\','+i+')">×</button><div class="g">'+F('نام هزینه',I('fixed.'+i+'.name',x.name,0))+F('مبلغ ماهانه (تومان)',I('fixed.'+i+'.amt',x.amt,1))+'</div></div>';});
+return h+'<button class="add" onclick="add(\'fixed\',{name:\'\',amt:0})">+ هزینه جدید</button></section><div class="tot" id="out"></div>';};
+O.fix=function(){$('out').innerHTML='جمع هزینه ثابت ماهانه: <b>'+fa(fixedT())+'</b> تومان';};
+
+V.plan=function(){
+var h='<h1>پیش‌بینی با موجودی انبار</h1><div class="note">تعداد پرس برنامه‌ریزی‌شده برای هر غذا را بزنید. موجودی فعلی انبار (بعد از خرید و فروش‌ها) بین همه غذاها تقسیم می‌شود.</div><section>';
+S.dishes.forEach((d,i)=>{h+=F(esc(d.name||'بدون نام'),I('dishes.'+i+'.plan',d.plan,1))+'<div style="height:8px"></div>';});
+return h+'</section><section><h2>مصرف مواد در برنامه</h2><div class="sc" id="out"></div></section><section><h2>ظرفیت هر غذا</h2><div class="sc" id="out2"></div></section>';};
+O.plan=function(){
+var need={};S.dishes.forEach(d=>d.recipe.forEach(r=>{need[r.ing]=(need[r.ing]||0)+d.plan*r.g/1000;}));
+$('out').innerHTML='<table><tr><th>ماده</th><th>نیاز</th><th>موجودی</th><th>باقی‌مانده</th></tr>'+S.ings.filter(g=>need[g.id]).map(g=>{var rm=avail(g)-need[g.id];return '<tr><td>'+esc(g.name)+'</td><td>'+fa1(need[g.id])+'</td><td>'+fa1(avail(g))+'</td><td class="'+(rm<0?'neg':'')+'">'+fa1(rm)+(rm<0?' (کمبود)':'')+'</td></tr>';}).join('')+'</table>';
+$('out2').innerHTML='<table><tr><th>غذا</th><th>با کل موجودی (فقط این غذا)</th><th>بعد از برنامه</th><th>محدودکننده</th></tr>'+S.dishes.map(d=>{var a=lim(d,g=>avail(g)),b=lim(d,g=>avail(g)-need[g.id]);return '<tr><td>'+esc(d.name)+'</td><td>'+(isFinite(a.c)?fa(Math.floor(a.c)):'-')+'</td><td>'+(isFinite(b.c)?fa(Math.floor(b.c)):'-')+'</td><td>'+esc(b.n)+'</td></tr>';}).join('')+'</table>';};
+
+function months(){var m={};S.sales.forEach(s=>{var k=mk(s.date);if(k)m[k]=1;});return Object.keys(m).sort();}
+function plData(){var rows={},tq=0,tr=0,tc=0;
+S.sales.forEach(s=>{if(pm!='all'&&mk(s.date)!=pm)return;s.items.forEach(x=>{var d=D(x.dish);if(!d)return;var r=rows[d.id]||(rows[d.id]={n:d.name,q:0,rev:0,c:0});r.q+=x.qty;r.rev+=x.qty*x.price;r.c+=x.qty*cost(d);});});
+var a=Object.keys(rows).map(k=>rows[k]);a.forEach(r=>{r.p=r.rev-r.c;tq+=r.q;tr+=r.rev;tc+=r.c;});
+var fx=fixedT()*(pm=='all'?Math.max(1,months().length):1);return{rows:a,tq:tq,tr:tr,tc:tc,fx:fx,net:tr-tc-fx};}
+V.pl=function(){return '<h1>سود و زیان</h1><div class="g" style="padding:0"><div><div class="hd">دوره</div><select onchange="pm=this.value;out()"><option value="all">همه فروش‌ها</option>'+months().map(m=>'<option value="'+m+'"'+(m==pm?' selected':'')+'>'+m+'</option>').join('')+'</select></div></div><div style="height:8px"></div><button class="pri" onclick="exportX()">دریافت فایل اکسل</button><div id="out"></div><div class="note">هزینه مواد با قیمت فعلی مواد و رسپی حساب می‌شود. هزینه ثابت برای هر ماه یک بار کم می‌شود.</div>';};
+O.pl=function(){var p=plData();
+$('out').innerHTML='<div class="tot'+(p.net<0?' l':'')+'">فروش: <b>'+fa(p.tr)+'</b> تومان ('+fa(p.tq)+' پرس)<br>هزینه مواد و بسته‌بندی: <b>'+fa(p.tc)+'</b> ('+pct(p.tc,p.tr)+')<br>هزینه ثابت: <b>'+fa(p.fx)+'</b><br>'+(p.net<0?'زیان':'سود')+' خالص: <b class="'+(p.net<0?'neg':'')+'">'+fa(Math.abs(p.net))+'</b> تومان</div><section class="sc"><table><tr><th>غذا</th><th>پرس</th><th>فروش</th><th>هزینه</th><th>٪ هزینه</th><th>سود</th></tr>'+p.rows.map(r=>'<tr><td>'+esc(r.n)+'</td><td>'+fa(r.q)+'</td><td>'+fa(r.rev)+'</td><td>'+fa(r.c)+'</td><td>'+pct(r.c,r.rev)+'</td><td class="'+(r.p<0?'neg':'')+'">'+fa(r.p)+'</td></tr>').join('')+'</table></section>';};
+async function saveFile(name,blob){var d=null;try{d=window.claude&&await claude.use('downloads');}catch(e){}if(!d)return false;try{await d.save({filename:name,data:blob});}catch(e){}return true;}
+async function exportX(){
+if(typeof XLSX=='undefined'){alert('کتابخانه اکسل بارگذاری نشد.');return;}
+var wb=XLSX.utils.book_new(),p=plData();
+function sh(n,r){XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(r),n);}
+var nm=id=>{var g=G(id);return g?g.name:'';},dn=id=>{var d=D(id);return d?d.name:'';};
+sh('سود و زیان',[['غذا','تعداد پرس','فروش','هزینه','درصد هزینه','سود']].concat(p.rows.map(r=>[r.n,r.q,Math.round(r.rev),Math.round(r.c),r.rev?+(r.c/r.rev*100).toFixed(1):0,Math.round(r.p)])).concat([[],['فروش کل',p.tr],['هزینه مواد',Math.round(p.tc)],['هزینه ثابت',p.fx],['سود خالص',Math.round(p.net)]]));
+sh('غذاها',[['غذا','نوع','قیمت فروش','هزینه ظرف','قیمت تمام‌شده']].concat(S.dishes.map(d=>[d.name,d.type=='take'?'بیرون‌بر':'رستوران',d.sale,d.pack,Math.round(cost(d))])));
+var rc=[['غذا','ماده','گرم در پرس']];S.dishes.forEach(d=>d.recipe.forEach(r=>rc.push([d.name,nm(r.ing),r.g])));sh('رسپی‌ها',rc);
+var pu=[['شماره','تاریخ','تأمین‌کننده','ماده','مقدار (کیلو)','مبلغ']];S.inv.forEach(v=>v.items.forEach(x=>pu.push([v.no,v.date,v.sup,nm(x.ing),x.qty,x.total])));sh('خرید',pu);
+var sl=[['شماره','تاریخ','مشتری','غذا','تعداد','قیمت هر پرس','جمع']];S.sales.forEach(v=>v.items.forEach(x=>sl.push([v.no,v.date,v.cust,dn(x.dish),x.qty,x.price,x.qty*x.price])));sh('فروش',sl);
+sh('هزینه‌ها',[['نام','مبلغ ماهانه']].concat(S.fixed.map(x=>[x.name,x.amt])));
+sh('موجودی',[['ماده','قیمت/کیلو','اولیه','خرید','ضایعات','موجودی','فروخته‌شده']].concat(S.ings.map(g=>[g.name,Math.round(price(g)),g.open,bought(g),g.used,avail(g),sold(g)])));
+wb.Workbook={Views:[{RTL:true}]};
+var ok=await saveFile('costiq.xlsx',new Blob([XLSX.write(wb,{type:'array',bookType:'xlsx'})]));
+if(!ok)alert('ذخیره فایل در این نمایش ممکن نیست.');}
+
+V.set=function(){return '<h1>تنظیمات و پشتیبان</h1><section><h2>پشتیبان‌گیری</h2><div class="note">اطلاعات فقط در همین مرورگر ذخیره می‌شود. مرتب پشتیبان بگیرید.</div><button class="pri" onclick="backup()">دریافت فایل پشتیبان</button><textarea id="bk" rows="4" placeholder="اگر ذخیره فایل ممکن نبود، متن پشتیبان اینجا نمایش داده می‌شود. برای بازیابی هم می‌توانید متن را اینجا بچسبانید." style="direction:ltr"></textarea></section><section><h2>بازیابی و ایمپورت اکسل</h2><div class="note">اطلاعات فعلی جایگزین می‌شود. فایل پشتیبان یا متن بالا:</div><input type="file" onchange="restoreFile(this)" style="margin-bottom:8px"><button class="add" onclick="restoreText($(\'bk\').value)" style="margin-bottom:12px">بازیابی از متن</button><div class="hd">یا فایل اکسل خروجی همین برنامه (نسخه جدید):</div><input type="file" onchange="importX(this)"></section><section><button onclick="if(confirm(\'همه اطلاعات با نمونه جایگزین شود؟\')){S=sample();save();render();}">بازگشت به اطلاعات نمونه</button></section>';};
+async function backup(){var t=JSON.stringify(S);var ok=await saveFile('costiq-backup.json',new Blob([t],{type:'application/json'}));if(!ok)$('bk').value=t;}
+function restoreText(t){try{var o=mig(JSON.parse(t));if(!o)throw 0;S=o;save();tab='buy';render();alert('بازیابی شد.');}catch(e){alert('متن پشتیبان معتبر نیست.');}}
+function importX(el){var f=el.files[0];if(!f)return;if(typeof XLSX=='undefined'){alert('کتابخانه اکسل بارگذاری نشد.');return;}var r=new FileReader();r.onload=()=>{el.value='';try{
+var wb=XLSX.read(r.result,{type:'array'});function rows(n){var w=wb.Sheets[n];if(!w)throw new Error('شیت «'+n+'» پیدا نشد');return XLSX.utils.sheet_to_json(w,{header:1,defval:''}).slice(1);}
+var ings=rows('موجودی').filter(x=>x[0]).map((x,i)=>({id:i+1,name:String(x[0]),price:+x[1]||0,open:+x[2]||0,used:+x[4]||0}));
+var iid=n=>{var g=ings.find(x=>x.name==n);return g?g.id:0;};
+var dishes=rows('غذاها').filter(x=>x[0]).map((x,i)=>({id:i+1,name:String(x[0]),type:x[1]=='بیرون‌بر'?'take':'rest',sale:+x[2]||0,pack:+x[3]||0,plan:0,recipe:[]}));
+rows('رسپی‌ها').forEach(q=>{var d=dishes.find(x=>x.name==q[0]),g=iid(q[1]);if(d&&g)d.recipe.push({ing:g,g:+q[2]||0});});
+function grp(n,f){var m={},a=[];rows(n).filter(x=>x[3]).forEach(x=>{var k=x[0]+'|'+x[1]+'|'+x[2];if(!m[k]){m[k]={no:String(x[0]),date:String(x[1]),x2:String(x[2]),items:[]};a.push(m[k]);}m[k].items.push(f(x));});return a;}
+var inv=grp('خرید',x=>({ing:iid(x[3]),qty:+x[4]||0,total:+x[5]||0})).map(o=>({no:o.no,date:o.date,sup:o.x2,items:o.items}));
+var sales=grp('فروش',x=>{var d=dishes.find(y=>y.name==x[3]);return{dish:d?d.id:0,qty:+x[4]||0,price:+x[5]||0};}).map(o=>({no:o.no,date:o.date,cust:o.x2,items:o.items.filter(x=>x.dish)}));
+var fixed=rows('هزینه‌ها').filter(x=>x[0]).map(x=>({name:String(x[0]),amt:+x[1]||0}));
+if(!confirm('اطلاعات فعلی با محتوای فایل اکسل جایگزین شود؟'))return;S={ings:ings,inv:inv,sales:sales,fixed:fixed,dishes:dishes};save();tab='buy';render();alert('ایمپورت انجام شد.');
+}catch(e){alert('این فایل قابل خواندن نیست. فقط خروجی اکسل نسخه جدید همین برنامه قابل ایمپورت است. جزئیات: '+(e&&e.message?e.message:''));}};r.onerror=()=>alert('خواندن فایل ممکن نشد.');r.readAsArrayBuffer(f);}
+function restoreFile(el){var f=el.files[0];if(!f)return;var r=new FileReader();r.onload=()=>restoreText(r.result);r.readAsText(f);}
+window.licCheck?licCheck(render):render();
+</script>
+</body>
+</html>
